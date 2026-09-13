@@ -1,6 +1,8 @@
 (function () {
   "use strict";
 
+  if (["infrastructure", "watchrepair"].indexOf(document.documentElement.dataset.reality) !== -1) return;
+
   var palettes = [
     { bg: "#000000", fg: "#e8e8e8", accent: "#d4af37", secondary: "#9b6dff", warning: "#ff4d6d" },
     { bg: "#071114", fg: "#d9ffff", accent: "#5ee7d3", secondary: "#62a8ff", warning: "#ffb86c" },
