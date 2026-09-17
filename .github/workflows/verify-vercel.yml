@@ -1,0 +1,44 @@
+name: Verify Vercel static deployment
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check browser scripts
+        run: |
+          node --check assets/js/main.js
+          node --check assets/js/reality-engine.js
+          node --check assets/js/social-randomizer.js
+
+      - name: Run site regression tests
+        run: npm run test:worldwide
+
+      - name: Check required static assets
+        run: |
+          test -f index.html
+          test -f assets/css/style.css
+          test -f assets/js/reality-engine.js
+          test -f assets/images/spire-anomaly.png
+          test -f robots.txt
+          test -f sitemap.xml
+
+      - name: Check clean diff
+        run: git diff --check

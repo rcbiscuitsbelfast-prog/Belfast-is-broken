@@ -83,6 +83,27 @@ Or just double-click `index.html`.
 The included `.nojekyll` file prevents GitHub's Jekyll processor from touching
 your assets, so everything is served exactly as written.
 
+## Deploy to Vercel
+
+This is a root-level static site. In Vercel, import
+`rcbiscuitsbelfast-prog/Belfast-is-broken` and use these settings:
+
+- Framework preset: `Other`
+- Root directory: `./`
+- Build command: empty
+- Output directory: empty
+- Install command: empty
+
+Connect the Vercel project to the `main` branch and enable production deploys.
+Vercel's Git integration then creates a new deployment automatically whenever
+`main` receives a push. The GitHub workflow
+`.github/workflows/verify-vercel.yml` runs alongside it and checks the browser
+scripts, tests, and required CSS, JavaScript, image, robots, and sitemap files.
+
+The workflow validates the deployment source; it does not use a Vercel token.
+That keeps credentials out of the repository. A direct GitHub-to-Vercel deploy
+requires a Vercel token and project/org IDs stored as GitHub Actions secrets.
+
 ---
 
 ## How to add a new blog post

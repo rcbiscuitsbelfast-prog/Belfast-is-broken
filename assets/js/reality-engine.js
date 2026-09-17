@@ -66,6 +66,34 @@
     document.body.appendChild(switcher);
   }
 
+  function addVisibilityRealityShift() {
+    var hiddenAt = 0;
+    var realityOrder = ["archive", "infrastructure", "watchrepair"];
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") {
+        hiddenAt = Date.now();
+        return;
+      }
+
+      if (!hiddenAt || Date.now() - hiddenAt < 1500) return;
+      hiddenAt = 0;
+
+      try {
+        if (sessionStorage.getItem("bib_visibility_shifted") === "1") return;
+        sessionStorage.setItem("bib_visibility_shifted", "1");
+      } catch (error) {}
+
+      var currentIndex = realityOrder.indexOf(reality.id);
+      var nextReality = realityOrder[(currentIndex + 1) % realityOrder.length];
+      var nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.set("reality", nextReality);
+      window.location.replace(nextUrl.href);
+    });
+  }
+
+  addVisibilityRealityShift();
+
   setTimeout(function () {
     if (reality.id === "infrastructure") {
       renderInfrastructure();
