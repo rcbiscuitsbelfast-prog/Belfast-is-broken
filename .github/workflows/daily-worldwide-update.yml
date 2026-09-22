@@ -2,7 +2,12 @@ name: Daily worldwide update
 
 on:
   schedule:
-    - cron: '0 6 * * *'
+    # Fire once per UTC hour at midnight, 1am, and 2am. Only one randomly
+    # chosen hour actually updates — so the feed refreshes once overnight
+    # between 12:00–03:00 UTC without burning a 3-hour Actions sleep.
+    - cron: '0 0 * * *'
+    - cron: '0 1 * * *'
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:
@@ -12,21 +17,46 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Choose tonight's random hour (12am–3am UTC)
+        id: gate
+        run: |
+          DAY=$(date -u +%F)
+          # Stable-random hour 0, 1, or 2 for this calendar day
+          HASH=$(printf '%s' "$DAY-worldwide" | sha256sum | cut -c1-8)
+          CHOSEN=$((16#$HASH % 3))
+          HOUR=$(date -u +%-H)
+          # Extra minute jitter inside the chosen hour (manual runs always proceed)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Manual run — skipping hour gate."
+            exit 0
+          fi
+          if [ "$HOUR" -eq "$CHOSEN" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Tonight's slot is ${CHOSEN}:00 UTC — running update."
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping — tonight's slot is ${CHOSEN}:00 UTC, this run is ${HOUR}:00 UTC."
+          fi
+
       - name: Set up Node
+        if: steps.gate.outputs.run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Run update script
+        if: steps.gate.outputs.run == 'true'
         run: |
           npm install
           npm run update:worldwide
 
       - name: Commit updated feed
+        if: steps.gate.outputs.run == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add worldwide.html
+          git add worldwide.html data/worldwide-state.json
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else

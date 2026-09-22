@@ -1,7 +1,12 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { buildEntryMarkup, getYouTubeVideoId } = require('./update-worldwide.js');
+const {
+  buildEntryMarkup,
+  getYouTubeVideoId,
+  pickDailyEntries,
+  ENTRIES_PER_DAY,
+} = require('./update-worldwide.js');
 
 test('extracts YouTube video IDs from watch URLs', () => {
   assert.equal(
@@ -36,6 +41,26 @@ test('buildEntryMarkup prefers real thumbnails over generic placeholder text', (
 
   assert.match(html, /<img class="entry-thumb"/);
   assert.doesNotMatch(html, /\[ TIKTOK ·/);
+});
+
+test('pickDailyEntries never reuses an id or the same YouTube video', () => {
+  const pool = [
+    { id: '001', title: 'A', url: 'https://www.youtube.com/watch?v=aaaaaaaaaaa', platform: 'youtube', summary: 'a' },
+    { id: '002', title: 'B', url: 'https://www.youtube.com/watch?v=bbbbbbbbbbb', platform: 'youtube', summary: 'b' },
+    { id: '003', title: 'C', url: 'https://www.youtube.com/watch?v=aaaaaaaaaaa', platform: 'youtube', summary: 'c' },
+    { id: '004', title: 'D', url: 'https://example.com/d', platform: 'blog', summary: 'd' },
+    { id: '005', title: 'E', url: 'https://example.com/e', platform: 'blog', summary: 'e' },
+  ];
+  const state = {
+    lastUpdated: null,
+    published: [{ id: '001', publishedDate: '2099-01-01' }],
+  };
+
+  const { added } = pickDailyEntries(pool, state);
+  assert.equal(added.length, ENTRIES_PER_DAY);
+  assert.ok(!added.some((item) => item.id === '001'));
+  assert.ok(!added.some((item) => item.url.includes('aaaaaaaaaaa')));
+  assert.equal(new Set(added.map((item) => item.id)).size, added.length);
 });
 
 test('buildEntryMarkup includes platform routing for TikTok and Facebook', () => {
