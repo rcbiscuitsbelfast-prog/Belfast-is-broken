@@ -1,15 +1,15 @@
 DROP YOUR CLIPS HERE
 ====================
 
-The pages reference video "exhibits" as placeholders (styled image stills and
-dashed .vid-ph boxes). To show a real video instead, add an .mp4 to this folder
-and replace the placeholder markup in the relevant .html file with:
+Current exhibits:
+  - exhibit-a-0922.mp4   (home page VIDEO EXHIBIT A + Belfast anomalies feed)
 
-  <video controls width="100%" poster="assets/images/video-still.png">
-    <source src="assets/videos/clip_0043.mp4" type="video/mp4" />
-    Your browser cannot play this recovered footage.
+Also cross-posted:
+  - TikTok https://www.tiktok.com/@belfastisbroken/video/7688499209653194006
+  - X      https://x.com/belfastisbroken/status/2102533994982031794
+
+To add another clip, drop an .mp4 here and wire it in the relevant .html:
+
+  <video controls playsinline preload="metadata" poster="assets/images/video-still.png" width="100%">
+    <source src="assets/videos/your-clip.mp4" type="video/mp4" />
   </video>
-
-Suggested filenames used in the copy:
-  - clip_0043.mp4      (home page, "VIDEO EXHIBIT A")
-  - cctv_still.mp4     (Belfast anomalies, "CCTV DISTORTION")

@@ -1,5 +1,12 @@
 # BELFAST ANOMALIES — source log
 
+## FIELD UPLOAD — 22 SEPT
+- [VIDEO] Raw CapCut export on home + anomalies feed.
+- File: `assets/videos/exhibit-a-0922.mp4`
+- TikTok: https://www.tiktok.com/@belfastisbroken/video/7688499209653194006
+- X: https://x.com/belfastisbroken/status/2102533994982031794
+
+
 Each entry below corresponds to an `<article class="entry">` block in
 `anomalies.html`. To add a new anomaly: copy an entry block in that file,
 update the title / timestamp / tag / description, and point the image at a
